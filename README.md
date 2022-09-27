@@ -17,14 +17,17 @@ Translations:
 ## Overview
 
 ![初始畫面](./assets/all.bmp "初始畫面")
-----------------------------------------------
-![賣出買入](./assets/queue.bmp "賣出買入")
+
 * 查看買賣委託狀態
-![成交紀錄](./assets/trade.bmp "成交紀錄")
+![賣出買入](./assets/queue.bmp "賣出買入")
+
 * 會將匹配的訂單顯示
-![操作](./assets/action.bmp "操作")
+![成交紀錄](./assets/trade.bmp "成交紀錄")
+
 * 限價單的買入/賣出
 * 市價單的買入
+![操作](./assets/action.bmp "操作")
+
 
 採用多線程同步下單，並用WebSocket做廣播，讓每個使用者的資訊同步
 使用lock來避免多人下單，重複成交的問題
