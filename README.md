@@ -20,6 +20,7 @@ cmd/example.go  為主程式
 指令: go run example.go --port 8888
 port預設 8080
 
+畫面網址:localhost:8080/demo
 ## 初始畫面
 
 ![初始畫面](./assets/all.bmp "初始畫面")
