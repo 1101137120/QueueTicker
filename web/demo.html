@@ -283,10 +283,12 @@
                     $(".item-amount").hide();
                     $(".item-market-type").hide();
                     $(".qty-tips").hide();
+                    $(".sell").show();
                 } else if (data.value == "market") {
                     $(".item-price").hide();
                     $(".item-market-type").show();
                     $(".qty-tips").show();
+                    $(".sell").hide();
                 }
                 form.render('select');
             });
