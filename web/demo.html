@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Demo</title>
+    <link rel="stylesheet" type="text/css" href="/static/layui/css/layui.css" />
+</head>
+
+<script id="depth-ask-tpl" type="text/html">
+
+    <tr><th colspan="2" style="text-align:center;">委託</th></tr>
+    <tr><th width="40%">價格</th><th>數量</th></tr>
+    
+    {%#  layui.each(d, function(index, item){ %}
+    <tr>
+        <td>{% item[0] %}</td><td>{% item[1] %}</td>
+    </tr>
+    {%#  }); %} 
+  </script>
+
+<script id="depth-bid-tpl" type="text/html">
+    {%#  layui.each(d, function(index, item){ %}
+    <tr>
+        <td width="40%">{% item[0] %}</td><td>{% item[1] %}</td>
+    </tr>
+    {%#  }); %}
+  </script>
+
+<script id="trade-log-tpl" type="text/html">
+    <tr class="log-item">
+        <td>{% d.TradePrice %}</td>
+        <td>{% d.TradeQuantity %}</td>
+        <td>{% d.TradeAmount %}</td>
+        <td>{% d.TradeTime %}</td>
+    </tr>
+  </script>
+
+<script id="myorder-tpl" type="text/html">
+    <tr class="order-item" order-id="{% d.order_id%}">
+        <td>{% d.price_type %}</td>
+        <td>{% d.price %}</td>
+        <td>{% d.quantity %}/<span class="qty_ok">0</span></td>
+        <td>{%# if(d.amount==0) { %} - {%#  } else { %}  {% d.amount %} {%# } %}</td>
+        <td>{% d.create_time %}</td>
+        <td><a class="cancel" href="javascript:;">撤單</a></td>
+    </tr>
+  </script>
+
+<body>
+    <div class="main ">
+
+
+
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md4 ">
+                <div class="layui-row layui-col-space5">
+                    <table class="layui-table depth-ask" style="background-color: #FFB800;">
+                        <tr>
+                            <th colspan="2" style="text-align:center;">委託</th>
+                        </tr>
+                        <tr>
+                            <th width="40%">價格</th>
+                            <th>數量</th>
+                        </tr>
+                        <tr></tr>
+                    </table>
+                </div>
+
+                <div class="layui-row layui-col-space5" style="background-color: #F6F6F6;">
+                    <div style="text-align: center; color:red;">最新價 <span class="latest-price">-</span></div>
+                </div>
+
+                <div class="layui-row layui-col-space5">
+                    <table class="layui-table depth-bid" style="background-color: #5FB878;">
+                        <tr></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="layui-col-md4">
+                <table class="layui-table trade-log">
+                    <tr>
+                        <th style="text-align: center;" colspan="4">成交紀錄</th>
+                    </tr>
+                    <tr>
+                        <th>價格</th>
+                        <th>數量</th>
+                        <th>金額</th>
+                        <th>時間</th>
+                    </tr>
+                    <tr class="log"></tr>
+
+                </table>
+            </div>
+
+            <div class="layui-col-md4">
+                <div class="layui-row">
+                    <div class="layui-card">
+                        <div class="layui-card-header"><b>測試下單</b></div>
+                        <div class="layui-card-body">
+                            <form class="layui-form" onsubmit="return false">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">訂單類型</label>
+                                    <div class="layui-input-block">
+                                        <select name="price_type" lay-filter="price_type">
+                                            <option value="limit">限價單</option>
+                                            <option value="market">市價單</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item item-price">
+                                    <label class="layui-form-label">價格</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="price" required lay-verify="required|number"
+                                            placeholder="請輸入價格" autocomplete="off" class="layui-input" value="1.00">
+                                    </div>
+                                </div>
+
+
+                                <div class="layui-form-item item-quantity">
+                                    <label class="layui-form-label">數量</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="quantity" required lay-verify="required|number"
+                                            placeholder="請輸入數量" autocomplete="off" class="layui-input" value="10">
+                                            <span class="qty-tips" style="font-size: 10px; display: none;">市價按數量買入時，需要用戶可用資金做限制條件，測試系統默認持有100塊可用資金</span>
+                                    </div>
+                                </div>
+
+
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button class="layui-btn layui-btn-danger opt sell">賣出</button>
+                                        <button class="layui-btn layui-btn-primary opt buy">買入</button>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-card">
+                        <div class="layui-card-header"><b>我的下單</b></div>
+                        <div class="layui-card-body">
+                            <table class="layui-table">
+                                <tr>
+                                    <th>類型</th>
+                                    <th>價格</th>
+                                    <th>數量/已成</th>
+                                    <th>金額</th>
+                                    <th>時間</th>
+                                    <th>操作</th>
+                                </tr>
+                                <tr class="myorder"></tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+    <script src="/static/layui/layui.js"></script>
+    <script type="text/javascript">
+        layui.use(['laydate', 'layer', 'table', 'element', 'laytpl', 'form'], function () {
+            var laydate = layui.laydate 
+                , layer = layui.layer
+                , table = layui.table
+                , $ = layui.$
+                , laytpl = layui.laytpl
+                , form = layui.form
+                , element = layui.element;
+
+            laytpl.config({
+                open: '{%',
+                close: '%}'
+            });
+
+
+
+            function formatTime(t) {
+                var d = new Date(t);
+                return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+            }
+
+            function createUUID() {
+                var dt = new Date().getTime();
+                var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    var r = (dt + Math.random() * 16) % 16 | 0;
+                    dt = Math.floor(dt / 16);
+                    return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                });
+                return uuid;
+            }
+
+            $(".opt").on("click", function () {
+                var type = $(this).hasClass("sell") ? "ask" : "bid";
+                var price_type = $("select[name='price_type']").val();
+
+                $.ajax({
+                    url: "/api/new_order",
+                    type: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: function () {
+                        var data = {
+                            price_type: price_type,
+                            order_type: type,
+                        };
+
+                        if (price_type == "market") {
+                                data.quantity = $("input[name='quantity']").val();
+                        } else {
+                            data.price = $("input[name='price']").val();
+                            data.quantity = $("input[name='quantity']").val();
+                        }
+
+                        console.log(data);
+                        return JSON.stringify(data)
+                    }(),
+                    success: function (d) {
+                        if(d.ok){
+                            layer.msg("下單" + d.ok + " askLen:" + d.data.ask_len + " bidLen:" + d.data.bid_len);
+                        }else{
+                            layer.msg(d.error);
+                        }
+                    }
+                });
+            });
+
+            $(".test-rand").on("click", function () {
+                var op_type = "ask", me = $(this);
+                if ($(this).hasClass("buy")) {
+                    op_type = "bid";
+                }
+
+                me.attr("disabled", true);
+
+                $.ajax({
+                    url: "/api/test_rand?op_type=" + op_type,
+                    type: "get",
+                    success: function (d) {
+                        layer.msg("操作" + d.ok + " askLen:" + d.data.ask_len + " bidLen:" + d.data.bid_len);
+                        me.attr("disabled", false);
+                    }
+                });
+
+            });
+
+            $("body").on("click", ".cancel", function () {
+                var me = $(this);
+                $.ajax({
+                    url: "/api/cancel_order",
+                    type: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        order_id: me.parents("tr").attr("order-id")
+                    }),
+                    success: function (d) {
+                        layer.msg("取消 " + d.ok);
+                        if (d.ok) {
+                            me.parents("tr").remove();
+                        }
+                    }
+                });
+            });
+
+
+            form.on('select(price_type)', function (data) {
+                if (data.value == "limit") {
+                    $(".item-price").show();
+                    $(".item-quantity").show();
+                    $(".item-amount").hide();
+                    $(".item-market-type").hide();
+                    $(".qty-tips").hide();
+                } else if (data.value == "market") {
+                    $(".item-price").hide();
+                    $(".item-market-type").show();
+                    $(".qty-tips").show();
+                }
+                form.render('select');
+            });
+            form.on('radio(market-type)', function (data) {
+                if (data.value == "q") {
+                    $(".item-quantity").show();
+                    $(".item-amount").hide();
+                    $(".qty-tips").show();
+                } else {
+                    $(".item-quantity").hide();
+                    $(".qty-tips").hide();
+                    $(".item-amount").show();
+                }
+            });
+
+
+            $().ready(function(){
+                $.get("/api/trade_log", function (d) {
+                    if (d.ok) {
+                        console.log(d);
+                        $(".latest-price").html(d.data.latest_price);
+
+                        var recent_log = d.data.trade_log;
+                        for(var i=0; i<recent_log.length; i++){
+                            rendertradelog(recent_log[i]);
+                        }
+
+                    }
+                });
+            });
+
+
+            function rendertradelog(data) {
+                var logView = $(".trade-log .log"),
+                    logTpl = $("#trade-log-tpl").html();
+
+                data['TradeTime'] = formatTime(data.TradeTime/1e6);
+                laytpl(logTpl).render(data, function (html) {
+                    if ($(".log-item").length > 10) {
+                        $(".log-item").last().remove();
+                    }
+                    logView.after(html);
+
+                    //remove myorder
+                    $("tr[order-id='" + data.AskOrderId + "']").remove();
+                    $("tr[order-id='" + data.BidOrderId + "']").remove();
+                });
+            }
+
+
+            var socket = function () {
+                if (window["WebSocket"]) {
+                    var protocol = window.location.protocol == "https:" ? "wss:" : "ws:";
+                    conn = new WebSocket(protocol + "//" + document.location.host + "/ws");
+                    conn.onclose = function (evt) {
+                        layer.msg("<b>WebSocket Connection closed</b>");
+                        setTimeout(function () {
+                            socket();
+                        }, 5e3);
+                    };
+                    conn.onmessage = function (evt) {
+                        var messages = evt.data.split('\n');
+                        for (var i = 0; i < messages.length; i++) {
+                            var data = JSON.parse(messages[i]);
+                            if (data.tag == "depth") {
+                                var info = data.data;
+                                var askTpl = $("#depth-ask-tpl").html()
+                                    , askView = $(".depth-ask")
+                                    , bidTpl = $("#depth-bid-tpl").html()
+                                    , bidView = $(".depth-bid");
+
+
+                                laytpl(askTpl).render(info.ask.reverse(), function (html) {
+                                    askView.html(html);
+                                });
+                                laytpl(bidTpl).render(info.bid, function (html) {
+                                    bidView.html(html);
+                                });
+
+                            } else if (data.tag == "trade") {
+                                rendertradelog(data.data);
+                                
+                            } else if (data.tag == "new_order") {
+                                var myorderView = $(".myorder"),
+                                    myorderTpl = $("#myorder-tpl").html();
+
+                                data.data['create_time'] = formatTime(data.data.create_time);
+                                laytpl(myorderTpl).render(data.data, function (html) {
+                                    if ($(".order-item").length > 30) {
+                                        $(".order-item").last().remove();
+                                    }
+                                    myorderView.after(html);
+                                });
+                            } else if (data.tag == "latest_price") {
+                                $(".latest-price").html(data.data.latest_price);
+                            }
+                        }
+                    };
+                } else {
+                    layer.msg("<b>Your browser does not support WebSockets.</b>");
+                }
+            };
+            socket();
+
+        });
+    </script>
+</body>
+
+</html>
